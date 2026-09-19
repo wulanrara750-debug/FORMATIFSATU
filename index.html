@@ -584,7 +584,7 @@
             records.push(record);
             localStorage.setItem('quiz_records_f2', JSON.stringify(records));
 
-            if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "PASTE_URL_GOOGLE_APPS_SCRIPT_DI_SINI") {
+            if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "https://script.google.com/macros/s/AKfycbyCLoVVo5rlQ-YWNBE3tVevu3kjGXdpkyDo5NXRs98y6wP4jM-L7bWsczkO2JQ8dUNXqA/exec") {
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
