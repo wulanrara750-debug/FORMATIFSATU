@@ -53,7 +53,29 @@
 
         .hidden { display: none !important; }
 
-        /* Story Container */
+        /* Accordion Bacaan Kasus */
+        .story-toggle-btn {
+            width: 100%;
+            background-color: #ebf8ff;
+            color: var(--primary-color);
+            border: 2px solid var(--secondary-color);
+            padding: 12px 15px;
+            border-radius: 8px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            transition: background 0.2s;
+        }
+
+        .story-toggle-btn:hover {
+            background-color: #bee3f8;
+        }
+
         .story-box {
             background: #ebf8ff;
             border-left: 5px solid var(--secondary-color);
@@ -158,11 +180,36 @@
     </header>
 
     <div class="container">
-        <!-- STEP 1: IDENTITAS SISWA & NARASI AWAL -->
+        <!-- STEP 1: IDENTITAS SISWA -->
         <div id="screen-intro">
             <h2>Formatif 2: Penjualan Toko Mainan Ceria</h2>
+            <p style="margin-top: 5px; color: #4a5568;">Isi data diri Anda terlebih dahulu untuk memulai pengerjaan.</p>
             <br>
-            <div class="story-box">
+            <form onsubmit="startQuiz(event)">
+                <label for="student-name"><b>Nama Lengkap Siswa:</b></label>
+                <input type="text" id="student-name" required placeholder="Masukkan nama Anda...">
+                
+                <label for="student-class"><b>Kelas / No. Absen:</b></label>
+                <input type="text" id="student-class" required placeholder="Contoh: 7A / 12">
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Mulai Mengerjakan Kuis</button>
+            </form>
+        </div>
+
+        <!-- STEP 2: PENGERJAAN SOAL & BACAAN INTERAKTIF -->
+        <div id="screen-quiz" class="hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <span id="question-tracker" style="font-weight: bold;">Soal 1 dari 4</span>
+                <span class="timer-badge" id="timer-display">⏱ Waktu: 00:00</span>
+            </div>
+
+            <!-- BACAAN DAPAT DIBUKA / DITUTUP SAAT MENGERJAKAN -->
+            <button type="button" class="story-toggle-btn" onclick="toggleStory()">
+                <span>📖 Tampilkan / Sembunyikan Bacaan Kasus</span>
+                <span id="story-toggle-icon">▼ Klik untuk membuka</span>
+            </button>
+
+            <div id="story-container" class="story-box hidden">
                 <h3>📖 Kasus: Toko Mainan Ceria</h3>
                 <p>Toko Mainan Ceria mencatat hasil penjualan mainan selama satu minggu. Berikut data penjualan mereka:</p>
                 <br>
@@ -183,24 +230,6 @@
                     </tbody>
                 </table>
                 <p>Pemilik toko ingin mengetahui perkembangan penjualan agar dapat menentukan strategi promosi minggu berikutnya.</p>
-            </div>
-
-            <form onsubmit="startQuiz(event)">
-                <label for="student-name"><b>Nama Lengkap Siswa:</b></label>
-                <input type="text" id="student-name" required placeholder="Masukkan nama Anda...">
-                
-                <label for="student-class"><b>Kelas / No. Absen:</b></label>
-                <input type="text" id="student-class" required placeholder="Contoh: 7A / 12">
-
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Mulai Mengerjakan Kuis</button>
-            </form>
-        </div>
-
-        <!-- STEP 2: PENGERJAAN SOAL -->
-        <div id="screen-quiz" class="hidden">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <span id="question-tracker" style="font-weight: bold;">Soal 1 dari 4</span>
-                <span class="timer-badge" id="timer-display">⏱ Waktu: 00:00</span>
             </div>
 
             <!-- SVG Visual Animasi Ilustrasi -->
@@ -268,7 +297,7 @@
     </div>
 
     <script>
-        // URL GOOGLE APPS SCRIPT (Tempelkan URL Web App Anda di bawah)
+        // URL GOOGLE APPS SCRIPT
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_EVEtgeJAkLGWCE9yTTI3EOIlV6J3wL_K2QZ0LcgHWZQgb1rm7TsiIfWBqlR28KHXQg/exec";
 
         // SANDI PORTAL GURU
@@ -327,8 +356,12 @@
         let bgmOn = false;
         let voOn = true;
         let audioCtx;
+        let bgmNoteIndex = 0;
 
-        // BGM Audio Engine
+        // BGM Audio Engine (Semangat / Suasana Kompetisi)
+        // Melodi Arpeggio Cepat & Energik (C Minor / Up-beat Rhythm)
+        const upbeatNotes = [261.63, 311.13, 392.00, 523.25, 392.00, 311.13, 349.23, 440.00];
+
         function playBGM() {
             if (!bgmOn) return;
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -336,15 +369,22 @@
             
             let osc = audioCtx.createOscillator();
             let gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(293.66, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+            
+            // Menggunakan gelombang 'sawtooth' agar menghasilkan suara khas gim/kompetisi yang energik
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(upbeatNotes[bgmNoteIndex % upbeatNotes.length], audioCtx.currentTime);
+            
+            gain.gain.setValueAtTime(0.015, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+            
             osc.connect(gain);
             gain.connect(audioCtx.destination);
+            
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.3);
+            osc.stop(audioCtx.currentTime + 0.15);
 
-            if(bgmOn) setTimeout(playBGM, 600);
+            bgmNoteIndex++;
+            if (bgmOn) setTimeout(playBGM, 180); // Tempo cepat (180ms)
         }
 
         function toggleBGM() {
@@ -358,6 +398,18 @@
             document.getElementById('btn-vo').innerText = `🔊 Suara/VO: ${voOn ? 'ON' : 'OFF'}`;
             if (!voOn && window.speechSynthesis) window.speechSynthesis.cancel();
             else speakCurrentQuestion();
+        }
+
+        function toggleStory() {
+            const container = document.getElementById('story-container');
+            const icon = document.getElementById('story-toggle-icon');
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                icon.innerText = '▲ Klik untuk menutup';
+            } else {
+                container.classList.add('hidden');
+                icon.innerText = '▼ Klik untuk membuka';
+            }
         }
 
         function speakText(text) {
@@ -474,12 +526,10 @@
             }
         }
 
-        // CALCULATE RESULT FORMATIF 2 (SKOR MAX 16)
         function calculateResult() {
             let pgkScore = 0; // max 12
             let uraianScore = 0; // max 4
 
-            // PGK Scoring
             quizData.forEach((q) => {
                 if (q.type === 'pgk') {
                     q.statements.forEach((st) => {
@@ -490,11 +540,9 @@
                 }
             });
 
-            // Uraian Scoring
             quizData.forEach((q, idx) => {
                 if (q.type === 'uraian') {
                     let userAns = (studentAnswers[`uraian_${idx}`] || '').toLowerCase();
-                    // Mengecek apakah terdapat angka 320 dan 32.000
                     let hasMainan = userAns.includes("320");
                     let hasPendapatan = userAns.includes("32000") || userAns.includes("32.000") || userAns.includes("32 rb");
 
@@ -508,7 +556,7 @@
                 }
             });
 
-            let totalSkor = pgkScore + uraianScore; // Max 16
+            let totalSkor = pgkScore + uraianScore;
             let nilaiAkhir = Math.round((totalSkor / 16) * 100);
 
             let kategori = "";
@@ -532,12 +580,10 @@
                 date: new Date().toLocaleString("id-ID")
             };
 
-            // 1. Simpan ke LocalStorage browser
             let records = JSON.parse(localStorage.getItem('quiz_records_f2') || '[]');
             records.push(record);
             localStorage.setItem('quiz_records_f2', JSON.stringify(records));
 
-            // 2. Kirim data otomatis ke Google Sheets
             if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "PASTE_URL_GOOGLE_APPS_SCRIPT_DI_SINI") {
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
@@ -549,7 +595,6 @@
                 }).catch(error => console.error('Error pengiriman ke Google Sheets:', error));
             }
 
-            // Tampilkan Layar Hasil
             document.getElementById('screen-quiz').classList.add('hidden');
             document.getElementById('screen-result').classList.remove('hidden');
 
@@ -572,7 +617,6 @@
             location.reload();
         }
 
-        // PORTAL GURU FUNCTIONS
         function openTeacherPortal() {
             let pass = prompt("Masukkan Kata Sandi Guru:");
             if (pass === TEACHER_PASS) {
