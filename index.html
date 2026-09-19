@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Interaktif - Toko Mainan Ceria (Formatif 2)</title>
+    <style>
+        :root {
+            --primary-color: #1a365d;
+            --secondary-color: #2b6cb0;
+            --accent-color: #ed8936;
+            --bg-color: #ebf8ff;
+            --card-bg: #ffffff;
+            --text-color: #2d3748;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; display: flex; flex-direction: column; }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .audio-controls button, .btn-portal {
+            background: var(--secondary-color);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            margin-left: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-portal { background: var(--accent-color); color: white; }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+            flex-grow: 1;
+            width: 95%;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Story Container */
+        .story-box {
+            background: #ebf8ff;
+            border-left: 5px solid var(--secondary-color);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        .media-box {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .media-box svg {
+            max-width: 180px;
+            height: auto;
+        }
+
+        /* Forms & Inputs */
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 20px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        /* Table Rules */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            border: 1px solid #cbd5e0;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th { background-color: #e2e8f0; }
+
+        .center-text { text-align: center; }
+
+        /* Timer Badge */
+        .timer-badge {
+            background: #e53e3e;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* Button Navigation */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        .btn-primary { background: var(--primary-color); color: white; }
+        .btn-secondary { background: #718096; color: white; }
+        .btn-danger { background: #e53e3e; color: white; }
+        .btn:disabled { background: #cbd5e0; cursor: not-allowed; }
+
+        /* Result styling */
+        .result-card {
+            text-align: center;
+            padding: 20px;
+        }
+        .score-display {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h2>Kuis Matematika Interaktif</h2>
+        <div class="audio-controls">
+            <button id="btn-bgm" onclick="toggleBGM()">🎵 Musik: OFF</button>
+            <button id="btn-vo" onclick="toggleVO()">🔊 Suara/VO: ON</button>
+            <button class="btn-portal" onclick="openTeacherPortal()">🔑 Portal Guru</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- STEP 1: IDENTITAS SISWA & NARASI AWAL -->
+        <div id="screen-intro">
+            <h2>Formatif 2: Penjualan Toko Mainan Ceria</h2>
+            <br>
+            <div class="story-box">
+                <h3>📖 Kasus: Toko Mainan Ceria</h3>
+                <p>Toko Mainan Ceria mencatat hasil penjualan mainan selama satu minggu. Berikut data penjualan mereka:</p>
+                <br>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Hari</th>
+                            <th>Jumlah Mainan Terjual</th>
+                            <th>Total Pendapatan (Rp)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Senin</td><td>1.250</td><td>125.000</td></tr>
+                        <tr><td>Selasa</td><td>2.150</td><td>215.000</td></tr>
+                        <tr><td>Rabu</td><td>1.800</td><td>180.000</td></tr>
+                        <tr><td>Kamis</td><td>2.350</td><td>235.000</td></tr>
+                        <tr><td>Jumat</td><td>1.900</td><td>190.000</td></tr>
+                    </tbody>
+                </table>
+                <p>Pemilik toko ingin mengetahui perkembangan penjualan agar dapat menentukan strategi promosi minggu berikutnya.</p>
+            </div>
+
+            <form onsubmit="startQuiz(event)">
+                <label for="student-name"><b>Nama Lengkap Siswa:</b></label>
+                <input type="text" id="student-name" required placeholder="Masukkan nama Anda...">
+                
+                <label for="student-class"><b>Kelas / No. Absen:</b></label>
+                <input type="text" id="student-class" required placeholder="Contoh: 7A / 12">
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Mulai Mengerjakan Kuis</button>
+            </form>
+        </div>
+
+        <!-- STEP 2: PENGERJAAN SOAL -->
+        <div id="screen-quiz" class="hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <span id="question-tracker" style="font-weight: bold;">Soal 1 dari 4</span>
+                <span class="timer-badge" id="timer-display">⏱ Waktu: 00:00</span>
+            </div>
+
+            <!-- SVG Visual Animasi Ilustrasi -->
+            <div class="media-box" id="media-container"></div>
+
+            <div id="question-container"></div>
+
+            <div class="nav-buttons">
+                <button id="btn-prev" class="btn btn-secondary" onclick="prevQuestion()">Sebelumnya</button>
+                <button id="btn-next" class="btn btn-primary" onclick="nextQuestion()">Selanjutnya</button>
+                <button id="btn-finish" class="btn btn-primary hidden" onclick="confirmFinish()">Selesai & Kirim</button>
+            </div>
+        </div>
+
+        <!-- STEP 3: HASIL AKHIR SISWA -->
+        <div id="screen-result" class="hidden">
+            <div class="result-card">
+                <h2>Hasil Penilaian Formatif 2</h2>
+                <p>Terima kasih telah menyelesaikan kuis ini!</p>
+                
+                <div class="score-display" id="final-score">0</div>
+                <p id="final-category" style="font-size: 1.2rem; font-weight: bold; margin-bottom: 10px;"></p>
+                <p id="final-time"></p>
+                
+                <hr style="margin: 20px 0;">
+                
+                <div style="display: flex; justify-content: center; gap: 15px;">
+                    <button class="btn btn-primary" onclick="resetQuiz()">Mengerjakan Ulang / Masuk Sebagai Siswa Lain</button>
+                    <button class="btn btn-danger" onclick="exitQuiz()">Keluar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 4: PORTAL GURU (REKAP DATA) -->
+        <div id="screen-teacher" class="hidden">
+            <h2>🔑 Portal Guru - Rekapitulasi Data Hasil Kuis (Formatif 2)</h2>
+            <p style="margin-bottom: 15px;">Data nilai seluruh siswa yang telah menyelesaikan kuis:</p>
+
+            <button class="btn btn-primary" onclick="downloadExcel()" style="margin-bottom: 15px;">📥 Unduh Data Rekap (Excel/CSV)</button>
+            <button class="btn btn-secondary" onclick="clearData()" style="margin-bottom: 15px; background: #c53030;">🗑 Hapus Semua Data Browser</button>
+
+            <div style="overflow-x: auto;">
+                <table id="teacher-table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Siswa</th>
+                            <th>Kelas</th>
+                            <th>Waktu Pengerjaan</th>
+                            <th>Skor PGK (12)</th>
+                            <th>Skor Uraian (4)</th>
+                            <th>Nilai Akhir</th>
+                            <th>Kategori</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teacher-tbody">
+                        <!-- Dynamic Rows -->
+                    </tbody>
+                </table>
+            </div>
+
+            <br>
+            <button class="btn btn-secondary" onclick="closeTeacherPortal()">Kembali ke Kuis</button>
+        </div>
+    </div>
+
+    <script>
+        // URL GOOGLE APPS SCRIPT (Tempelkan URL Web App Anda di bawah)
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_EVEtgeJAkLGWCE9yTTI3EOIlV6J3wL_K2QZ0LcgHWZQgb1rm7TsiIfWBqlR28KHXQg/exec";
+
+        // SANDI PORTAL GURU
+        const TEACHER_PASS = "GuruCerdas#2026!Math";
+
+        // DATA SOAL (SESUAI NASKAH F2 REVISI)
+        const quizData = [
+            {
+                type: 'pgk',
+                prompt: "Perhatikan data penjualan Toko Mainan Ceria dari hari Senin hingga Jumat pada tabel data di atas.",
+                statements: [
+                    { id: '1a', text: "a. Pola penjualan mainan dari Senin ke Jumat cenderung meningkat terus setiap harinya.", key: "Salah" },
+                    { id: '1b', text: "b. Penjualan tertinggi terjadi pada hari Kamis dengan 2.350 mainan.", key: "Benar" },
+                    { id: '1c', text: "c. Contoh transaksi yang melibatkan penjumlahan bilangan serupa adalah menjumlahkan 1.500 lembar kertas dan 300 lembar kertas tambahan menjadi 1.800 lembar.", key: "Benar" },
+                    { id: '1d', text: "d. Pola penjualan yang naik-turun seperti ini disebut pola penjualan yang stabil.", key: "Salah" }
+                ],
+                svg: `<svg viewBox="0 0 100 100"><path d="M10 80 L30 60 L50 30 L70 50 L90 20" fill="none" stroke="#2b6cb0" stroke-width="4"/><circle cx="50" cy="30" r="5" fill="#ed8936"/></svg>`
+            },
+            {
+                type: 'pgk',
+                prompt: "Kelompokkan hari-hari berdasarkan jumlah mainan yang terjual (di bawah atau di atas 2.000).",
+                statements: [
+                    { id: '2a', text: "a. Hari Selasa dan Kamis termasuk kelompok penjualan di atas 2.000 unit.", key: "Benar" },
+                    { id: '2b', text: "b. Hari Senin, Rabu, dan Jumat termasuk kelompok penjualan di bawah 2.000 unit.", key: "Benar" },
+                    { id: '2c', text: "c. Selisih penjualan hari Kamis dan Rabu adalah 2.350 − 1.800 = 550 mainan.", key: "Benar" },
+                    { id: '2d', text: "d. Penjualan hari Rabu lebih banyak dibandingkan hari Kamis.", key: "Salah" }
+                ],
+                svg: `<svg viewBox="0 0 100 100"><rect x="15" y="40" width="30" height="50" fill="#319795"/><rect x="55" y="20" width="30" height="70" fill="#2b6cb0"/><line x1="5" y1="90" x2="95" y2="90" stroke="#000" stroke-width="2"/></svg>`
+            },
+            {
+                type: 'pgk',
+                prompt: "Total penjualan mainan selama lima hari pertama (Senin−Jumat) dihitung dengan menjumlahkan seluruh mainan yang terjual: 1.250+2.150+1.800+2.350+1.900 = 9.450 mainan. Langkah yang sama juga digunakan untuk menghitung total pendapatan toko selama lima hari.",
+                statements: [
+                    { id: '3a', text: "a. Kalimat ringkas yang tepat adalah 'Selama lima hari, toko berhasil menjual 9.450 mainan.'", key: "Benar" },
+                    { id: '3b', text: "b. Semakin banyak mainan yang terjual, semakin besar pendapatan yang diperoleh toko.", key: "Benar" },
+                    { id: '3c', text: "c. Langkah kedua adalah menjumlahkan seluruh pendapatan harian: 125.000+215.000+180.000+235.000+190.000.", key: "Benar" },
+                    { id: '3d', text: "d. Langkah yang tepat adalah mengalikan seluruh pendapatan harian, bukan menjumlahkannya.", key: "Salah" }
+                ],
+                svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="35" fill="#38a169"/><text x="50" y="58" font-size="22" fill="#fff" text-anchor="middle" font-weight="bold">Rp</text></svg>`
+            },
+            {
+                type: 'uraian',
+                prompt: "Pada hari Sabtu, Toko Mainan Ceria menargetkan penjualan 2.500 mainan dengan pendapatan Rp250.000,00. Namun, hasil penjualan menunjukkan hanya 2.180 mainan dengan pendapatan Rp218.000,00. Berapa selisih jumlah mainan dan selisih pendapatan antara target dan hasil penjualan toko tersebut?",
+                placeholder: "Tuliskan langkah perhitungan dan hasil selisih mainan serta selisih pendapatannya...",
+                keyKeywords: ["320", "32.000", "32000", "32 rb"],
+                svg: `<svg viewBox="0 0 100 100"><path d="M20 70 L50 20 L80 70 Z" fill="#dd6b20"/><text x="50" y="60" font-size="16" fill="#fff" text-anchor="middle" font-weight="bold">Δ</text></svg>`
+            }
+        ];
+
+        // App States
+        let currentIdx = 0;
+        let studentAnswers = {};
+        let currentStudent = {};
+        let timerInterval;
+        let secondsElapsed = 0;
+        let bgmOn = false;
+        let voOn = true;
+        let audioCtx;
+
+        // BGM Audio Engine
+        function playBGM() {
+            if (!bgmOn) return;
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(293.66, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+
+            if(bgmOn) setTimeout(playBGM, 600);
+        }
+
+        function toggleBGM() {
+            bgmOn = !bgmOn;
+            document.getElementById('btn-bgm').innerText = `🎵 Musik: ${bgmOn ? 'ON' : 'OFF'}`;
+            if (bgmOn) playBGM();
+        }
+
+        function toggleVO() {
+            voOn = !voOn;
+            document.getElementById('btn-vo').innerText = `🔊 Suara/VO: ${voOn ? 'ON' : 'OFF'}`;
+            if (!voOn && window.speechSynthesis) window.speechSynthesis.cancel();
+            else speakCurrentQuestion();
+        }
+
+        function speakText(text) {
+            if (!voOn || !('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            let utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'id-ID';
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function startTimer() {
+            secondsElapsed = 0;
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                let m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+                let s = (secondsElapsed % 60).toString().padStart(2, '0');
+                document.getElementById('timer-display').innerText = `⏱ Waktu: ${m}:${s}`;
+            }, 1000);
+        }
+
+        function startQuiz(e) {
+            e.preventDefault();
+            let name = document.getElementById('student-name').value;
+            let cls = document.getElementById('student-class').value;
+            currentStudent = { name, class: cls };
+
+            document.getElementById('screen-intro').classList.add('hidden');
+            document.getElementById('screen-quiz').classList.remove('hidden');
+
+            startTimer();
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = quizData[currentIdx];
+            document.getElementById('question-tracker').innerText = `Soal ${currentIdx + 1} dari ${quizData.length}`;
+            document.getElementById('media-container').innerHTML = q.svg;
+
+            let html = `<p style="font-size: 1.1rem; line-height: 1.5; margin-bottom: 15px;"><b>${q.prompt}</b></p>`;
+
+            if (q.type === 'pgk') {
+                html += `<table>
+                    <thead>
+                        <tr>
+                            <th>Pernyataan</th>
+                            <th class="center-text" style="width: 80px;">Benar</th>
+                            <th class="center-text" style="width: 80px;">Salah</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+                q.statements.forEach((st) => {
+                    let ans = studentAnswers[st.id] || '';
+                    html += `<tr>
+                        <td>${st.text}</td>
+                        <td class="center-text">
+                            <input type="radio" name="st_${st.id}" value="Benar" ${ans === 'Benar' ? 'checked' : ''} onchange="saveAnswer('${st.id}', 'Benar')">
+                        </td>
+                        <td class="center-text">
+                            <input type="radio" name="st_${st.id}" value="Salah" ${ans === 'Salah' ? 'checked' : ''} onchange="saveAnswer('${st.id}', 'Salah')">
+                        </td>
+                    </tr>`;
+                });
+                html += `</tbody></table>`;
+            } else {
+                let ans = studentAnswers[`uraian_${currentIdx}`] || '';
+                html += `
+                    <label><b>Jawaban / Langkah Penyelesaian Anda:</b></label>
+                    <textarea id="input-uraian" rows="4" style="width:100%; padding:10px; margin-top:10px; border-radius:6px; border:1px solid #ccc;" placeholder="${q.placeholder}" oninput="saveAnswer('uraian_${currentIdx}', this.value)">${ans}</textarea>
+                `;
+            }
+
+            document.getElementById('question-container').innerHTML = html;
+
+            document.getElementById('btn-prev').disabled = currentIdx === 0;
+            if (currentIdx === quizData.length - 1) {
+                document.getElementById('btn-next').classList.add('hidden');
+                document.getElementById('btn-finish').classList.remove('hidden');
+            } else {
+                document.getElementById('btn-next').classList.remove('hidden');
+                document.getElementById('btn-finish').classList.add('hidden');
+            }
+
+            speakCurrentQuestion();
+        }
+
+        function speakCurrentQuestion() {
+            let q = quizData[currentIdx];
+            let textToRead = `Soal nomor ${currentIdx + 1}. ` + q.prompt;
+            speakText(textToRead);
+        }
+
+        function saveAnswer(key, val) {
+            studentAnswers[key] = val;
+        }
+
+        function nextQuestion() {
+            if (currentIdx < quizData.length - 1) {
+                currentIdx++;
+                renderQuestion();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentIdx > 0) {
+                currentIdx--;
+                renderQuestion();
+            }
+        }
+
+        function confirmFinish() {
+            if (confirm("Apakah Anda yakin ingin menyelesaikan kuis ini?")) {
+                clearInterval(timerInterval);
+                calculateResult();
+            }
+        }
+
+        // CALCULATE RESULT FORMATIF 2 (SKOR MAX 16)
+        function calculateResult() {
+            let pgkScore = 0; // max 12
+            let uraianScore = 0; // max 4
+
+            // PGK Scoring
+            quizData.forEach((q) => {
+                if (q.type === 'pgk') {
+                    q.statements.forEach((st) => {
+                        if (studentAnswers[st.id] === st.key) {
+                            pgkScore += 1;
+                        }
+                    });
+                }
+            });
+
+            // Uraian Scoring
+            quizData.forEach((q, idx) => {
+                if (q.type === 'uraian') {
+                    let userAns = (studentAnswers[`uraian_${idx}`] || '').toLowerCase();
+                    // Mengecek apakah terdapat angka 320 dan 32.000
+                    let hasMainan = userAns.includes("320");
+                    let hasPendapatan = userAns.includes("32000") || userAns.includes("32.000") || userAns.includes("32 rb");
+
+                    if (hasMainan && hasPendapatan) {
+                        uraianScore += 4;
+                    } else if (hasMainan || hasPendapatan) {
+                        uraianScore += 2;
+                    } else if (userAns.trim().length > 5) {
+                        uraianScore += 1;
+                    }
+                }
+            });
+
+            let totalSkor = pgkScore + uraianScore; // Max 16
+            let nilaiAkhir = Math.round((totalSkor / 16) * 100);
+
+            let kategori = "";
+            if (nilaiAkhir >= 81) kategori = "Sangat Baik";
+            else if (nilaiAkhir >= 71) kategori = "Baik";
+            else if (nilaiAkhir >= 61) kategori = "Cukup";
+            else kategori = "Perlu Bimbingan";
+
+            let m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+            let s = (secondsElapsed % 60).toString().padStart(2, '0');
+            let timeFormatted = `${m}:${s}`;
+
+            let record = {
+                name: currentStudent.name,
+                class: currentStudent.class,
+                time: timeFormatted,
+                pgkScore: pgkScore,
+                uraianScore: uraianScore,
+                finalScore: nilaiAkhir,
+                kategori: kategori,
+                date: new Date().toLocaleString("id-ID")
+            };
+
+            // 1. Simpan ke LocalStorage browser
+            let records = JSON.parse(localStorage.getItem('quiz_records_f2') || '[]');
+            records.push(record);
+            localStorage.setItem('quiz_records_f2', JSON.stringify(records));
+
+            // 2. Kirim data otomatis ke Google Sheets
+            if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "PASTE_URL_GOOGLE_APPS_SCRIPT_DI_SINI") {
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(record)
+                }).catch(error => console.error('Error pengiriman ke Google Sheets:', error));
+            }
+
+            // Tampilkan Layar Hasil
+            document.getElementById('screen-quiz').classList.add('hidden');
+            document.getElementById('screen-result').classList.remove('hidden');
+
+            document.getElementById('final-score').innerText = nilaiAkhir;
+            document.getElementById('final-category').innerText = `Kategori: ${kategori}`;
+            document.getElementById('final-time').innerText = `Waktu Pengerjaan: ${timeFormatted}`;
+        }
+
+        function resetQuiz() {
+            currentIdx = 0;
+            studentAnswers = {};
+            document.getElementById('screen-result').classList.add('hidden');
+            document.getElementById('screen-intro').classList.remove('hidden');
+            document.getElementById('student-name').value = '';
+            document.getElementById('student-class').value = '';
+        }
+
+        function exitQuiz() {
+            alert("Terima kasih sudah mengerjakan kuis!");
+            location.reload();
+        }
+
+        // PORTAL GURU FUNCTIONS
+        function openTeacherPortal() {
+            let pass = prompt("Masukkan Kata Sandi Guru:");
+            if (pass === TEACHER_PASS) {
+                renderTeacherTable();
+                document.getElementById('screen-intro').classList.add('hidden');
+                document.getElementById('screen-quiz').classList.add('hidden');
+                document.getElementById('screen-result').classList.add('hidden');
+                document.getElementById('screen-teacher').classList.remove('hidden');
+            } else if (pass !== null) {
+                alert("Kata sandi salah!");
+            }
+        }
+
+        function closeTeacherPortal() {
+            document.getElementById('screen-teacher').classList.add('hidden');
+            document.getElementById('screen-intro').classList.remove('hidden');
+        }
+
+        function renderTeacherTable() {
+            let records = JSON.parse(localStorage.getItem('quiz_records_f2') || '[]');
+            let tbody = document.getElementById('teacher-tbody');
+            tbody.innerHTML = '';
+
+            if (records.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="center-text">Belum ada data siswa pada browser ini.</td></tr>`;
+                return;
+            }
+
+            records.forEach((rec, idx) => {
+                let tr = `<tr>
+                    <td>${idx + 1}</td>
+                    <td>${rec.name}</td>
+                    <td>${rec.class}</td>
+                    <td>${rec.time}</td>
+                    <td>${rec.pgkScore} / 12</td>
+                    <td>${rec.uraianScore} / 4</td>
+                    <td><b>${rec.finalScore}</b></td>
+                    <td>${rec.kategori}</td>
+                </tr>`;
+                tbody.innerHTML += tr;
+            });
+        }
+
+        function downloadExcel() {
+            let records = JSON.parse(localStorage.getItem('quiz_records_f2') || '[]');
+            if (records.length === 0) {
+                alert("Tidak ada data untuk diunduh!");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,No,Nama Siswa,Kelas,Waktu Pengerjaan,Skor PGK,Skor Uraian,Nilai Akhir,Kategori,Tanggal\n";
+            records.forEach((r, i) => {
+                csvContent += `${i+1},"${r.name}","${r.class}",${r.time},${r.pgkScore},${r.uraianScore},${r.finalScore},"${r.kategori}","${r.date}"\n`;
+            });
+
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "Rekap_Nilai_Formatif_2_Revisi.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function clearData() {
+            if (confirm("Apakah Anda yakin ingin menghapus data rekap nilai Formatif 2 pada browser ini?")) {
+                localStorage.removeItem('quiz_records_f2');
+                renderTeacherTable();
+            }
+        }
+    </script>
+</body>
+</html>
