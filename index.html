@@ -182,7 +182,7 @@
     <div class="container">
         <!-- STEP 1: IDENTITAS SISWA -->
         <div id="screen-intro">
-            <h2>Formatif 2: Penjualan Toko Mainan Ceria</h2>
+            <h2>Formatif 1: Penjualan Toko Mainan Ceria</h2>
             <p style="margin-top: 5px; color: #4a5568;">Isi data diri Anda terlebih dahulu untuk memulai pengerjaan.</p>
             <br>
             <form onsubmit="startQuiz(event)">
@@ -247,7 +247,7 @@
         <!-- STEP 3: HASIL AKHIR SISWA -->
         <div id="screen-result" class="hidden">
             <div class="result-card">
-                <h2>Hasil Penilaian Formatif 2</h2>
+                <h2>Hasil Penilaian Formatif 1</h2>
                 <p>Terima kasih telah menyelesaikan kuis ini!</p>
                 
                 <div class="score-display" id="final-score">0</div>
@@ -265,7 +265,7 @@
 
         <!-- STEP 4: PORTAL GURU (REKAP DATA) -->
         <div id="screen-teacher" class="hidden">
-            <h2>🔑 Portal Guru - Rekapitulasi Data Hasil Kuis (Formatif 2)</h2>
+            <h2>🔑 Portal Guru - Rekapitulasi Data Hasil Kuis (Formatif 1)</h2>
             <p style="margin-bottom: 15px;">Data nilai seluruh siswa yang telah menyelesaikan kuis:</p>
 
             <button class="btn btn-primary" onclick="downloadExcel()" style="margin-bottom: 15px;">📥 Unduh Data Rekap (Excel/CSV)</button>
@@ -675,14 +675,14 @@
             let encodedUri = encodeURI(csvContent);
             let link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "Rekap_Nilai_Formatif_2_Revisi.csv");
+            link.setAttribute("download", "Rekap_Nilai_Formatif_1_Revisi.csv");
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         }
 
         function clearData() {
-            if (confirm("Apakah Anda yakin ingin menghapus data rekap nilai Formatif 2 pada browser ini?")) {
+            if (confirm("Apakah Anda yakin ingin menghapus data rekap nilai Formatif 1 pada browser ini?")) {
                 localStorage.removeItem('quiz_records_f2');
                 renderTeacherTable();
             }
